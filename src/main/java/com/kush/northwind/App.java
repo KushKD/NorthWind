@@ -10,6 +10,7 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.Projections;
 import org.hibernate.service.ServiceRegistry;
 import org.hibernate.service.ServiceRegistryBuilder;
+import org.hibernate.transform.AliasToBeanResultTransformer;
 import org.hibernate.transform.Transformers;
 
 /**
@@ -44,9 +45,9 @@ public class App
         			customer.getCountry()+",");
         }
         System.out.println(" Size:  "+ results.size());
-        
-//        Customer customer = (Customer)session.get(Customer.class, "ALFKI");
-//        System.out.println(customer.toString());
+//        
+////        Customer customer = (Customer)session.get(Customer.class, "ALFKI");
+////        System.out.println(customer.toString());
         Criteria cr2 = session.createCriteria(Employees.class);
         List<Employees> employees = cr2.list();
         
@@ -71,15 +72,15 @@ public class App
         			//employee.getReportsto()+","+
         			employee.getPhotopath());
         }
-        
+//        
         Criteria cr3 = session.createCriteria(Employees.class);
         cr3.setProjection(Projections.property("first_name"));
-        //In case of multiple filters we use projection list
-//        Projections.projectionList()
-//        .add(Projections.property("id"), "id")
-//        .add(Projections.property("Name"), "Name")
-        
-       // cr3.setResultTransformer(Transformers.aliasToBean(Employees.class));
+//        //In case of multiple filters we use projection list
+////        Projections.projectionList()
+////        .add(Projections.property("id"), "id")
+////        .add(Projections.property("Name"), "Name")
+//        
+//       // cr3.setResultTransformer(Transformers.aliasToBean(Employees.class));
         List<String> employees_projection = cr3.list();
         
         for(String name : employees_projection) {
@@ -89,13 +90,15 @@ public class App
         //Suppliers
         
         Criteria supplierCritera = session.createCriteria(Suppliers.class)
-        		.setProjection(Projections.projectionList() 
-        				      .add(Projections.property("city"))
-        				      .add(Projections.property("country"))
-        				      .add(Projections.property("companyName")));
+        		.setProjection(
+        				Projections.projectionList()
+        				      .add(Projections.property("city"),"city")
+        				      .add(Projections.property("country"),"country")
+        				      .add(
+        				    		  Projections.property("companyName"),"companyName"));
         supplierCritera.setResultTransformer(Transformers.aliasToBean(SupplierDTO.class));
         
-        List<SupplierDTO> dto = (List<SupplierDTO>) supplierCritera.list();
+        List<SupplierDTO> dto = supplierCritera.list();
         System.out.println("supplier:- "+ dto.size());
         
         for (int i = 0; i < dto.size(); i++) {
@@ -104,6 +107,6 @@ public class App
         }
           
         tx.commit();
-        session.disconnect();
+        session.close();
     }
 }

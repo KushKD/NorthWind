@@ -9,8 +9,9 @@ public class SupplierDTO implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 	private String city;
-	private String county;
+	private String country;
 	private String companyName;
+	
 	public SupplierDTO() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -22,10 +23,10 @@ public class SupplierDTO implements Serializable {
 		this.city = city;
 	}
 	public String getCounty() {
-		return county;
+		return country;
 	}
 	public void setCounty(String county) {
-		this.county = county;
+		this.country = county;
 	}
 	public String getCompanyName() {
 		return companyName;
@@ -35,7 +36,7 @@ public class SupplierDTO implements Serializable {
 	}
 	@Override
 	public String toString() {
-		return "SupplierDTO [city=" + city + ", county=" + county + ", companyName=" + companyName + "]";
+		return "SupplierDTO [city=" + city + ", county=" + country + ", companyName=" + companyName + "]";
 	}
 	
 	

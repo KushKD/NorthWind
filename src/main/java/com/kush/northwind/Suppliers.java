@@ -9,8 +9,8 @@ import javax.persistence.Table;
 @Table(name="suppliers")
 public class Suppliers {
 	
-	@Column(name="supplierid")
 	@Id
+	@Column(name="supplierid")
 	private Integer supplierId;
 	
 	@Column(name="companyname")
