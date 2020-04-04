@@ -1,4 +1,4 @@
-package com.kush.northwind;
+package dto;
 
 import java.io.Serializable;
 

@@ -1,4 +1,4 @@
-package com.kush.northwind;
+package entities;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -6,12 +6,12 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="suppliers")
-public class Suppliers {
+@Table(name="customers")
+public class Customer {
 	
 	@Id
-	@Column(name="supplierid")
-	private Integer supplierId;
+	@Column(name="customerid")
+	private String cutomer_id;
 	
 	@Column(name="companyname")
 	private String companyName;
@@ -28,11 +28,8 @@ public class Suppliers {
 	@Column(name="city")
 	private String city;
 	
-	@Column(name="region")
-	private String region;
-	
-	@Column(name="passcode")
-	private String passcode;
+	@Column(name="postalcode")
+	private String postalcode;
 	
 	@Column(name="country")
 	private String country;
@@ -42,38 +39,33 @@ public class Suppliers {
 	
 	@Column(name="fax")
 	private String fax;
-	
-	@Column(name="homepage")
-	private String homePage;
 
-	public Suppliers(Integer supplierId, String companyName, String contactName, String contactTitle, String address,
-			String city, String region, String passcode, String country, String phone, String fax, String homePage) {
+	public Customer() {
 		super();
-		this.supplierId = supplierId;
+		// TODO Auto-generated constructor stub
+	}
+
+	public Customer(String cutomer_id, String companyName, String contactName, String contactTitle, String address,
+			String city, String postalcode, String country, String phone, String fax) {
+		super();
+		this.cutomer_id = cutomer_id;
 		this.companyName = companyName;
 		this.contactName = contactName;
 		this.contactTitle = contactTitle;
 		this.address = address;
 		this.city = city;
-		this.region = region;
-		this.passcode = passcode;
+		this.postalcode = postalcode;
 		this.country = country;
 		this.phone = phone;
 		this.fax = fax;
-		this.homePage = homePage;
 	}
 
-	public Suppliers() {
-		super();
-		// TODO Auto-generated constructor stub
+	public String getCutomer_id() {
+		return cutomer_id;
 	}
 
-	public Integer getSupplierId() {
-		return supplierId;
-	}
-
-	public void setSupplierId(Integer supplierId) {
-		this.supplierId = supplierId;
+	public void setCutomer_id(String cutomer_id) {
+		this.cutomer_id = cutomer_id;
 	}
 
 	public String getCompanyName() {
@@ -116,20 +108,12 @@ public class Suppliers {
 		this.city = city;
 	}
 
-	public String getRegion() {
-		return region;
+	public String getPostalcode() {
+		return postalcode;
 	}
 
-	public void setRegion(String region) {
-		this.region = region;
-	}
-
-	public String getPasscode() {
-		return passcode;
-	}
-
-	public void setPasscode(String passcode) {
-		this.passcode = passcode;
+	public void setPostalcode(String postalcode) {
+		this.postalcode = postalcode;
 	}
 
 	public String getCountry() {
@@ -156,22 +140,15 @@ public class Suppliers {
 		this.fax = fax;
 	}
 
-	public String getHomePage() {
-		return homePage;
-	}
-
-	public void setHomePage(String homePage) {
-		this.homePage = homePage;
-	}
-
 	@Override
 	public String toString() {
-		return "Suppliers [supplierId=" + supplierId + ", companyName=" + companyName + ", contactName=" + contactName
-				+ ", contactTitle=" + contactTitle + ", address=" + address + ", city=" + city + ", region=" + region
-				+ ", passcode=" + passcode + ", country=" + country + ", phone=" + phone + ", fax=" + fax
-				+ ", homePage=" + homePage + "]";
+		return "Customer [cutomer_id=" + cutomer_id + ", companyName=" + companyName + ", contactName=" + contactName
+				+ ", contactTitle=" + contactTitle + ", address=" + address + ", city=" + city + ", postalcode="
+				+ postalcode + ", country=" + country + ", phone=" + phone + ", fax=" + fax + "]";
 	}
 	
+	
+
 	
 
 }

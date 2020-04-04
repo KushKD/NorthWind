@@ -1,4 +1,4 @@
-package com.kush.northwind;
+package entities;
 
 import java.util.Arrays;
 

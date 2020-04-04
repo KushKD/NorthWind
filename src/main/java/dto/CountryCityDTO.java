@@ -1,4 +1,4 @@
-package com.kush.northwind;
+package dto;
 
 public class CountryCityDTO {
 	

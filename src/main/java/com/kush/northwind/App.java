@@ -2,17 +2,34 @@ package com.kush.northwind;
 
 import java.util.List;
 
+import javax.persistence.criteria.Order;
+
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.Distinct;
+import org.hibernate.criterion.Projection;
 import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.service.ServiceRegistry;
 import org.hibernate.service.ServiceRegistryBuilder;
 import org.hibernate.transform.AliasToBeanResultTransformer;
 import org.hibernate.transform.Transformers;
+
+import dto.CategoriesDTO;
+import dto.CountryCityDTO;
+import dto.CustomerContactDTO;
+import dto.OrdersDateDifferenceDTO;
+import dto.SupplierDTO;
+import entities.Categories;
+import entities.Customer;
+import entities.Employees;
+import entities.OrderDetails;
+import entities.Orders;
+import entities.Products;
+import entities.Suppliers;
 
 /**
  * Hello world!
@@ -26,7 +43,12 @@ public class App
         Configuration conf = new Configuration().configure().addAnnotatedClass(Customer.class).
         													 addAnnotatedClass(Employees.class).
         													 addAnnotatedClass(Suppliers.class).
-        													 addAnnotatedClass(Categories.class);
+        													 addAnnotatedClass(Categories.class)
+															.addAnnotatedClass(Products.class)
+															.addAnnotatedClass(Orders.class)
+															.addAnnotatedClass(OrderDetails.class);
+        
+        
         ServiceRegistry srv = new ServiceRegistryBuilder().applySettings(conf.getProperties()).buildServiceRegistry();
         SessionFactory sf = conf.buildSessionFactory(srv);
         Session session = sf.openSession();
@@ -185,13 +207,127 @@ public class App
 			 */
 			
 			Criteria c8 = session.createCriteria(Suppliers.class) 
-		              .setProjection(Projections.distinct(Projections.countDistinct("city")));
+		              .setProjection(Projections.countDistinct("city"));
 			List count = c8.list();
 			
 			System.out.println("Suppliers Region count:- "+ count.get(0));
 //			for(String c : count ) {
 //				System.out.println(c); 
 //			}
+			
+			/**
+			 * SELECT COUNT(*) FROM products
+			 */
+			Criteria productsCount = session.createCriteria(Products.class).setProjection(Projections.rowCount());
+			List countRows =  productsCount.list();
+			System.out.println("Product Rows"+ countRows.get(0));
+			
+			/**
+			 * SELECT COUNT(*) FROM ORDERS
+			 */
+			
+			Criteria ordersCriteria = session.createCriteria(Orders.class)
+										.setProjection( Projections.rowCount());
+			List orderCount = ordersCriteria.list();
+			System.out.println("Order Count"+ orderCount);
+			
+			/**
+			 * How many Distinct Products have been ordered
+			 * SELECT DISTINCT COUNT(productid) FROM order_details;
+			 */
+			Criteria distinctProductsOrdered = session.createCriteria(OrderDetails.class)
+													  .setProjection(Projections.countDistinct("productid"));
+			List countProductsDistinct = distinctProductsOrdered.list();
+			System.out.println("countProductsDistinct "+ countProductsDistinct);
+			
+			
+			/**
+			 * List aor customerid and difference between ship date and order date for all our orders
+			 * SELECT customerid,  shippeddate - orderdate from orders 
+			 */
+			
+			Criteria differenceDates = session.createCriteria(Orders.class)
+					                          .setProjection(Projections.projectionList()
+					                        		            .add(Projections.property("customerid"),"customerid")
+					                        		            .add(Projections.property("differenceDates"),"differenceDates"))
+					                          					.add(Restrictions.isNotNull("differenceDates"));
+			
+			
+			differenceDates.setResultTransformer(Transformers.aliasToBean(OrdersDateDifferenceDTO.class));
+				List<OrdersDateDifferenceDTO> ordersDateDifferenceDTO = (List<OrdersDateDifferenceDTO>)differenceDates.list();
+				
+				System.out.println("OrdersDateDifferenceDTO :- "+ ordersDateDifferenceDTO.size());
+				int i = 1;
+				for(OrdersDateDifferenceDTO diff : ordersDateDifferenceDTO ) {
+				System.out.println(i+" " +diff.getCustomerid() +","+ diff.getDifferenceDates());
+				i++;
+				}
+				
+				/**
+				 * SELECT companyname from Suppliers WHERE city = 'Berlin';
+				 */
+				Criteria res_one = session.createCriteria(Suppliers.class)
+										  .setProjection(Projections.property("companyName"))
+										  .add(Restrictions.eq("city", "Berlin"));
+				List<String> data = res_one.list();
+				System.out.println("Data Size: "+data.size());
+				for(String s : data) {
+					System.out.println("Data:- "+s);
+				}
+				
+				/**
+				 * Find all customer names and Contacts that we have in Mexico from customers
+				 * 
+				 */
+				Criteria cj = session.createCriteria(Customer.class) 
+						             .setProjection(Projections.projectionList()   
+						            		 .add(Projections.property("companyName"),"companyName")  
+						            		 .add(Projections.property("contactName"),"contactName")) 
+						             		 .add(Restrictions.eq("country", "Mexico"));
+				cj.setResultTransformer(Transformers.aliasToBean(CustomerContactDTO.class));
+				List<CustomerContactDTO> dto_ = (List<CustomerContactDTO>)cj.list();
+				System.out.println(dto_.size());
+				for(CustomerContactDTO datax : dto_) {
+					System.out.println(datax.getCompanyName() +" "+ datax.getContactName());
+				}
+				
+				/**
+				 * Find Orders ordered by employee ID 3
+				 */
+				Criteria qw = session.createCriteria(Orders.class) 
+													.add(Restrictions.eq("employeeid",3));
+				List<Orders> orderByCustomer = qw.list();
+				System.out.println(orderByCustomer.size());
+				for(Orders x : orderByCustomer) {
+					System.out.println(x.toString());
+				}
+				
+				/**
+				 * SeLECT COUNT(*) FROM order_details WHERE quantity>20;
+				 */
+				 
+					Criteria qas = session.createCriteria(OrderDetails.class) 
+														.add(Restrictions.gt("quantity",20));
+					List<OrderDetails> orderDetails = qas.list();
+					System.out.println(orderDetails.size());
+					for(OrderDetails  x : orderDetails) {
+						System.out.println(x.toString());
+					}
+					
+					/**
+					 * freight
+					 * How many orders had a  freight cost equals to or greater than 250
+					 */
+					Criteria qq = session.createCriteria(Orders.class) 
+							.add(Restrictions.ge("freight", (float)250));
+							List<Orders> od = qq.list();
+							System.out.println(od.size());
+							for(Orders  x : od) {
+							System.out.println(x.toString());
+							}
+						
+
+			
           
         tx.commit();
         session.close();
