@@ -1,0 +1,14 @@
+#Connecting to PSQL
+psql -p 5432 -h localhost -d northwind -U postgres
+
+#quit 
+\q
+
+\l == list  liat all the databases
+\! clear    clear screen
+
+\c database_nae   connect to databses
+
+\dn 				see all the schemas
+
+\dt schema_name.   list all the tables in schema

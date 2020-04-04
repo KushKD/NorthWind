@@ -1,5 +1,8 @@
 package com.kush.northwind;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.criteria.Order;
@@ -38,7 +41,7 @@ import entities.Suppliers;
 public class App 
 {
     @SuppressWarnings("unchecked")
-	public static void main( String[] args )
+	public static void main( String[] args ) throws ParseException
     {
         Configuration conf = new Configuration().configure().addAnnotatedClass(Customer.class).
         													 addAnnotatedClass(Employees.class).
@@ -327,9 +330,87 @@ public class App
 							}
 						
 
-			
+							/**
+							 * No of Order that were ordered on or after January 01, 1998
+							 */
+							SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+							 Date date = formatter.parse("1998-01-01");
+							Criteria qqorferdate = session.createCriteria(Orders.class) .add(Restrictions.ge("orderdate", date));  //1996-07-04
+									List<Orders> dateorder = qqorferdate.list();
+									System.out.println(dateorder.size());
+//									for(Orders  x : dateorder) {
+//									System.out.println(x.toString());
+//									}
+						
+									
+				/**
+				 * How many orders were shipped to Germany and the freight costs more than 100
+				 */
+				Criteria operatorAnd = session.createCriteria(Orders.class) 
+											  .add(Restrictions.eq("shipcountry", "Germany"))
+											  .add(Restrictions.gt("freight", (float)100));
+				List<Orders> total = operatorAnd.list();
+				System.out.println("And Size:- " + total.size());
+				
+				
+				/**
+				 * We want the distinc customers where orders were shipped shipped via united packaa id =2 and
+				 * the ship country is brazil
+				 */
+				Criteria operatorAndtwo = session.createCriteria(Orders.class)
+						  .setProjection(Projections.distinct(Projections.property("customerid")))
+						  .add(Restrictions.eq("shipcountry", "Brazil"))
+						  .add(Restrictions.gt("shipvia", 2));
+					List<Orders> totalTwo = operatorAndtwo.list();
+					System.out.println("And Two Size:- " + totalTwo.size());
+				
+				/**
+				 * Logical OR
+				 * criteria.add(Restrictions.disjunction()
+                        .add(Restrictions.eq("bill.stateCd", null))
+                        .add(Restrictions.eq("bill.stateCd", ""))
+                        .add(Restrictions.ilike("bill.stateCd","%"+stateCd+"%")));
+                        How may Suppliers do we have in Germany and Spain
+				 */
+				Criteria or = session.createCriteria(Suppliers.class) 
+						             .add(Restrictions.disjunction()
+						            		 .add(Restrictions.eq("country", "Spain"))
+						            		 .add(Restrictions.eq("country", "Germany"))
+						            		 );
+				List<Suppliers>listOr = or.list();
+				System.out.println("OR Size "+listOr.size());
+				
+				
+				/**
+				 * Logical not Operators
+				 * add(Restrictions.ne("description","Mouse")); not equal to
+				 * Restrictions.between("DATE(auditDate)", sDate, eDate)); between
+				 * How many orders are shipped to Germany and fright charges less than 50 and greater than 175
+				 */
+				Criteria mix = session.createCriteria(Orders.class) 
+						              .add(Restrictions.eq("shipcountry", "Germany"))
+						              .add(Restrictions.disjunction()
+						            		  .add(Restrictions.lt("freight", (float)50))
+						            		  .add(Restrictions.ge("freight", (float)175)) 
+						            		  );
+						             		 
+				List<Orders> misOrders = mix.list();
+				System.out.println("Mix results: "+misOrders.size());
+				
+				
+				/**
+				 * In Clause using array
+				 * String[] employeeNames = { "test", "test2" };
+					List<Survey> surveys = getSession().createCriteria(Survey.class).add(
+					        Restrictions.and
+					        (
+					            Restrictions.eq("surveyNumber", 1),
+					            Restrictions.in("employeeName", employeeNames)
+					        )
+					    ).list();
+				 */
           
-        tx.commit();
+        tx.commit();	
         session.close();
     }
 }
