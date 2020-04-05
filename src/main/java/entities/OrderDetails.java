@@ -1,9 +1,19 @@
 package entities;
 
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 @Entity
 @Table(name="order_details")
@@ -23,7 +33,24 @@ public class OrderDetails {
 	private Integer quantity;
 	
 	@Column(name="discount")
-	private Float discount;
+	private Float discount; 
+	
+	@OneToOne(targetEntity = Products.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	//@Fetch(FetchMode.SUBSELECT)
+	@JoinColumn(name = "productid", updatable = false, insertable = false)
+	private Products products;
+	
+	
+
+
+
+	public Products getProducts() {
+		return products;
+	}
+
+	public void setProducts(Products products) {
+		this.products = products;
+	}
 
 	@Override
 	public String toString() {

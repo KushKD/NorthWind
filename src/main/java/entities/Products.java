@@ -1,16 +1,25 @@
 package entities;
 
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 @Entity
 @Table(name="products")
 public class Products {
 	
 	@Id
-	@Column(name="productid")
+	@Column(name="productid") 
 	private Integer productid;
 	
 	@Column(name="productname")
@@ -39,11 +48,31 @@ public class Products {
 	
 	@Column(name="discontinued")
 	private Integer discontinued ;
+	
+	@OneToMany(targetEntity = Suppliers.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@Fetch(FetchMode.SUBSELECT)
+	@JoinColumn(name = "supplierId", updatable = false, insertable = false)
+	private List<Suppliers> suppliers_; 
 
 	public Products() {
+		
 		super();
 		// TODO Auto-generated constructor stub
 	}
+	
+	
+
+	public List<Suppliers> getSuppliers_() {
+		return suppliers_;
+	}
+
+
+
+	public void setSuppliers_(List<Suppliers> suppliers_) {
+		this.suppliers_ = suppliers_;
+	}
+
+
 
 	public Integer getProductid() {
 		return productid;
@@ -125,13 +154,17 @@ public class Products {
 		this.discontinued = discontinued;
 	}
 
+
+
 	@Override
 	public String toString() {
 		return "Products [productid=" + productid + ", productname=" + productname + ", supplierid=" + supplierid
 				+ ", categoryid=" + categoryid + ", quantityperunit=" + quantityperunit + ", unitprice=" + unitprice
 				+ ", unitsinstock=" + unitsinstock + ", unitsonorder=" + unitsonorder + ", reorderlevel=" + reorderlevel
-				+ ", discontinued=" + discontinued + "]";
+				+ ", discontinued=" + discontinued + ", suppliers_=" + suppliers_ + "]";
 	}
+
+	
 	
 	
 	

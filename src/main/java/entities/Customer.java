@@ -1,9 +1,19 @@
 package entities;
 
+import java.util.List;
+import java.util.Set;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 @Entity
 @Table(name="customers")
@@ -25,6 +35,7 @@ public class Customer {
 	@Column(name="address")
 	private String address;
 	
+	
 	@Column(name="city")
 	private String city;
 	
@@ -38,26 +49,18 @@ public class Customer {
 	private String phone;
 	
 	@Column(name="fax")
-	private String fax;
+	private String fax; 
+	
+	@OneToMany(targetEntity = Orders.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@Fetch(FetchMode.SUBSELECT)
+	@JoinColumn(name = "customerid", updatable = false, insertable = false)
+	private List<Orders> orders;
+	
+	
 
 	public Customer() {
 		super();
 		// TODO Auto-generated constructor stub
-	}
-
-	public Customer(String cutomer_id, String companyName, String contactName, String contactTitle, String address,
-			String city, String postalcode, String country, String phone, String fax) {
-		super();
-		this.cutomer_id = cutomer_id;
-		this.companyName = companyName;
-		this.contactName = contactName;
-		this.contactTitle = contactTitle;
-		this.address = address;
-		this.city = city;
-		this.postalcode = postalcode;
-		this.country = country;
-		this.phone = phone;
-		this.fax = fax;
 	}
 
 	public String getCutomer_id() {
@@ -140,15 +143,37 @@ public class Customer {
 		this.fax = fax;
 	}
 
+	public List<Orders> getOrders() {
+		return orders;
+	}
+
+	public void setOrders(List<Orders> orders) {
+		this.orders = orders;
+	}
+
+	public Customer(String cutomer_id, String companyName, String contactName, String contactTitle, String address,
+			String city, String postalcode, String country, String phone, String fax, List<Orders> orders) {
+		super();
+		this.cutomer_id = cutomer_id;
+		this.companyName = companyName;
+		this.contactName = contactName;
+		this.contactTitle = contactTitle;
+		this.address = address;
+		this.city = city;
+		this.postalcode = postalcode;
+		this.country = country;
+		this.phone = phone;
+		this.fax = fax;
+		this.orders = orders;
+	}
+
 	@Override
 	public String toString() {
 		return "Customer [cutomer_id=" + cutomer_id + ", companyName=" + companyName + ", contactName=" + contactName
 				+ ", contactTitle=" + contactTitle + ", address=" + address + ", city=" + city + ", postalcode="
-				+ postalcode + ", country=" + country + ", phone=" + phone + ", fax=" + fax + "]";
+				+ postalcode + ", country=" + country + ", phone=" + phone + ", fax=" + fax + ", orders=" + orders
+				+ "]";
 	}
-	
-	
 
 	
-
 }

@@ -1,18 +1,26 @@
 package entities;
 
 import java.sql.Date;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.Formula;
 
 @Entity
 @Table(name="orders")
 public class Orders {
-	
+	 
 	@Id
 	@Column(name="orderid")
 	private Integer orderid	;
@@ -59,7 +67,24 @@ public class Orders {
 	@Column(name="shipcountry")
 	private String shipcountry;
 	
+	@OneToMany(targetEntity = OrderDetails.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@Fetch(FetchMode.SUBSELECT)
+	@JoinColumn(name = "orderid", updatable = false, insertable = false)
+	private List<OrderDetails> order_details;
 	
+	
+
+
+	public List<OrderDetails> getOrder_details() {
+		return order_details;
+	}
+
+
+	public void setOrder_details(List<OrderDetails> order_details) {
+		this.order_details = order_details;
+	}
+
+
 	public Orders() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -162,14 +187,7 @@ public class Orders {
 	}
 
 
-	@Override
-	public String toString() {
-		return "Orders [orderid=" + orderid + ", customerid=" + customerid + ", employeeid=" + employeeid
-				+ ", orderdate=" + orderdate + ", requireddate=" + requireddate + ", shippeddate=" + shippeddate
-				+ ", differenceDates=" + differenceDates + ", shipvia=" + shipvia + ", freight=" + freight
-				+ ", shipname=" + shipname + ", shipaddress=" + shipaddress + ", shipcity=" + shipcity + ", shipregion="
-				+ shipregion + ", shippostalcode=" + shippostalcode + ", shipcountry=" + shipcountry + "]";
-	}
+	
 	
 	
 	

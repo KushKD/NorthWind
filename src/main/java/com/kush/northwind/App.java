@@ -23,9 +23,13 @@ import org.hibernate.transform.AliasToBeanResultTransformer;
 import org.hibernate.transform.Transformers;
 
 import dto.CategoriesDTO;
+import dto.CompanyOrderDateShipCountryDTO;
 import dto.CountryCityDTO;
 import dto.CustomerContactDTO;
+import dto.FirstLastOrderDTO;
+import dto.MultipleTableDTO;
 import dto.OrdersDateDifferenceDTO;
+import dto.ProductNameSupplierDetailsDTO;
 import dto.SupplierDTO;
 import entities.Categories;
 import entities.Customer;
@@ -44,7 +48,7 @@ public class App
     @SuppressWarnings("unchecked")
 	public static void main( String[] args ) throws ParseException
     {
-        Configuration conf = new Configuration().configure().addAnnotatedClass(Customer.class).
+        Configuration conf = new Configuration().configure().addAnnotatedClass(Customer.class).  
         													 addAnnotatedClass(Employees.class).
         													 addAnnotatedClass(Suppliers.class).
         													 addAnnotatedClass(Categories.class)
@@ -486,6 +490,112 @@ public class App
 				/**
 				 * limit = setMax results
 				 */
+				
+				
+				/**
+				 * -- Bring Back Company Name, Order name and Ship Country
+						SELECT companyname, orderdate,shipcountry
+						FROM customers
+						INNER JOIN orders
+						ON orders.customerid = customers.customerid;
+				 */
+				
+				Criteria joinTest = session.createCriteria(Customer.class) 
+						                   .createAlias("orders", "orders")
+						                   .setProjection(Projections.projectionList() 						                		   					 
+						                		   .add(Projections.property("companyName"),"companyname")
+					                		   					 .add(Projections.property("orders.orderdate"),"orderdate") 
+						                		   				 .add(Projections.property("orders.shipcountry"),"shipcountry"));
+				joinTest.setResultTransformer(Transformers.aliasToBean(CompanyOrderDateShipCountryDTO.class));
+				List<Customer> joindata = joinTest.list();
+				
+				
+				System.out.println(" Join Data " +joindata.size());
+				
+				/**
+				 * Connect Employees to Orders and Pull back first name, last name and order date for all orders
+				 * SELECT companyname, orderdate,shipcountry
+						FROM customers
+						INNER JOIN orders
+						ON orders.customerid = customers.custome
+				 */
+				Criteria joinTest2 = session.createCriteria(Employees.class)
+						                    .createAlias("orders_employees", "oe")
+						                    .setProjection(
+						                    		Projections.projectionList().
+						                    		add(Projections.property("first_name"),"firstName").
+						                    		add(Projections.property("last_name"),"lastName").
+						                    		add(Projections.property("oe.orderdate"),"orderDate"));
+				joinTest2.setResultTransformer(Transformers.aliasToBean(FirstLastOrderDTO.class));
+				List<FirstLastOrderDTO> joinTestData = joinTest2.list();
+				System.out.println("Second One"+joinTestData.size());
+				
+				for(FirstLastOrderDTO datas : joinTestData) {
+					System.out.println(datas.getFirstName()+","+datas.getLastName()+","+datas.getOrderDate());
+				}
+				
+				
+				/**
+				 * -- Connect Products to Suppliers and Pull back Company Name , Unit Stock and Units in Stock
+						SELECT companyname,productname,unitsinstock,unitprice
+						FROM products as pro
+						INNER JOIN suppliers as sup
+						ON pro.supplierid = sup.supplierid;
+				 */
+				//ProductNameSupplierDetailsDTO
+				Criteria joinLearn = session.createCriteria(Products.class) 
+						                    .createAlias("suppliers_", "suppliers")
+						                    .setProjection( 
+						                    		Projections.projectionList()
+						                    		.add(Projections.property("unitsinstock"),"unitsinstock")
+						                    		.add(Projections.property("unitprice"),"unitprice")
+						                    		.add(Projections.property("suppliers.companyName"),"companyname")
+						                    		
+						                    		);
+				joinLearn.setResultTransformer(Transformers.aliasToBean(ProductNameSupplierDetailsDTO.class));
+				List<ProductNameSupplierDetailsDTO> jd = joinLearn.list();
+				System.out.println("Third Join One"+jd.size());
+				
+				for(ProductNameSupplierDetailsDTO datas : jd) {
+					System.out.println(datas.getCompanyname()+","+datas.getUnitprice()+","+datas.getUnitsinstock());
+				}
+						                    
+				/**
+				 * 
+				 * --Inner Joins For Multiple Tables
+					--Connect Customers,Orders,OrderDetails
+					-- Bring back company name , order date, product id, unit price ,  Quantity 
+					
+					SELECT companyname , orderdate, productid, unitprice , quantity
+					FROM customers c 
+					INNER JOIN orders o ON c.customerid = o.customerid 
+					INNER JOIN order_details od ON o.orderid = od.orderid;
+				 */
+				Criteria threetables = session.createCriteria(Customer.class) 
+						                      .createAlias("orders", "order")  
+						                      .createAlias("order.order_details", "order_details") 
+						                      .createAlias("order_details.products", "products") 
+						                      .setProjection(  
+						                    		  Projections.projectionList()
+						                    		  .add(Projections.property("companyName"),"companyName")  
+						                    		  .add(Projections.property("order.orderdate"),"orderdate")
+						                    		  .add(Projections.property("order_details.unitprice"),"unitprice")
+						                    		  .add(Projections.property("order_details.productid"),"productid")
+						                    		  .add(Projections.property("order_details.quantity"),"quantity")
+						                    		  .add(Projections.property("products.productname"),"productname")
+						                    		  );
+						                     
+						                      //.setMaxResults(10);
+				threetables.setResultTransformer(Transformers.aliasToBean(MultipleTableDTO.class));
+				List<MultipleTableDTO> mul = threetables.list();
+				System.out.println("MultipleTableDTO"+mul.size());
+				
+				for(MultipleTableDTO datas : mul) {
+					System.out.println(datas.getCompanyName()+","+datas.getOrderdate()+","+datas.getUnitprice()+","+datas.getProductid()+","+datas.getProductname()+","+datas.getQuantity());
+				}	                    		  
+			
+				
+				
 				
 				
           

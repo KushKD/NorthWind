@@ -2,11 +2,19 @@ package entities;
 
 import java.sql.Date;
 import java.util.Arrays;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 @Entity
 @Table(name="employees")
@@ -68,6 +76,26 @@ public class Employees {
 	private String photopath;
 	
 	
+	@OneToMany(targetEntity = Orders.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@Fetch(FetchMode.SUBSELECT)
+	@JoinColumn(name = "employeeid", updatable = false, insertable = false)
+	private List<Orders> orders_employees;
+	
+	
+	
+	
+
+	public List<Orders> getOrders_employees() {
+		return orders_employees;
+	}
+
+
+
+	public void setOrders_employees(List<Orders> orders_employees) {
+		this.orders_employees = orders_employees;
+	}
+
+
 
 	public Employees() {
 		super();
@@ -76,9 +104,12 @@ public class Employees {
 
 
 
+	
+
 	public Employees(int employeeid, String last_name, String first_name, String title, String titleOfCourtsey,
 			Date birthDate, Date hireDate, String address, String city, String region, String pincode, String country,
-			String homephone, String extention, byte[] photo, String notes, int reportsto, String photopath) {
+			String homephone, String extention, byte[] photo, String notes, Integer reportsto, String photopath,
+			List<Orders> orders_employees) {
 		super();
 		this.employeeid = employeeid;
 		this.last_name = last_name;
@@ -98,6 +129,7 @@ public class Employees {
 		this.notes = notes;
 		this.reportsto = reportsto;
 		this.photopath = photopath;
+		this.orders_employees = orders_employees;
 	}
 
 
@@ -325,8 +357,12 @@ public class Employees {
 				+ ", hireDate=" + hireDate + ", address=" + address + ", city=" + city + ", region=" + region
 				+ ", pincode=" + pincode + ", country=" + country + ", homephone=" + homephone + ", extention="
 				+ extention + ", photo=" + Arrays.toString(photo) + ", notes=" + notes + ", reportsto=" + reportsto
-				+ ", photopath=" + photopath + "]";
+				+ ", photopath=" + photopath + ", orders_employees=" + orders_employees + "]";
 	}
+
+
+
+	
 	
 	
 	
