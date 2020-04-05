@@ -409,6 +409,60 @@ public class App
 					        )
 					    ).list();
 				 */
+				
+				/**
+				 * SELECT country FROM suppliers ORDER BY country ASC/DESC
+				 * SELECT country, city FROM suppliers ORDER BY country ASC, city DESC
+				 * GET a list of product names and unit prices order by price highest to lowest and product name (a to Z ) asc
+				 * SELECT productname, unitprices from products ORDER BY price DESC , productname  asc
+				 * 
+				 * Criteria crit = session.createCriteria(Product.class);
+								crit.add(Restrictions.gt("price",10.0));
+								crit.addOrder(Order.desc("price"));
+								List<Product> results = crit.list();
+				 */
+				
+				
+				
+				/**
+				 * Min and Max 
+				 * SEelct min(orderdate) from orders Where country = 'Italy';
+				 * SELECT MAX(orderdate) from orders Where counrty = 'Canada';
+				 * SELECT MAX(shipdate - orderdate) as lowest from orders where country = france 
+				 * 
+				 * 
+				 */
+				
+				
+				/**
+				 * Average and Sum
+				 * SELECT AVG(freight) from orders WHERE shipcountry= 'Brazil';
+				 * Criteria crit = session.createCriteria(Product.class);
+					ProjectionList projList = Projections.projectionList();
+					projList.add(Projections.max("price"));
+					projList.add(Projections.min("price"));
+					projList.add(Projections.avg("price"));
+					projList.add(Projections.countDistinct("description"));
+					crit.setProjection(projList);
+					List<object[]> results = crit.list();
+				 */
+				
+				
+				/**
+				 *  'a%' == starts with a
+				 *  '%e' == ends with a
+				 *  'a%e' == starts with a and ends with e
+				 *  '%bob%'  == all string which contains bob
+				 *  '_a%'  == has a has a second character
+				 *  'E_%_%' ==Starts with E and has atleast two other letters 
+				 *  What customers have a contact whode firt name start with D
+				 */
+				
+				/**
+				 * limit = setMax results
+				 */
+				
+				
           
         tx.commit();	
         session.close();
