@@ -12,6 +12,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Distinct;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projection;
@@ -19,16 +20,19 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.service.ServiceRegistry;
 import org.hibernate.service.ServiceRegistryBuilder;
+import org.hibernate.sql.JoinType;
 import org.hibernate.transform.AliasToBeanResultTransformer;
 import org.hibernate.transform.Transformers;
 
 import dto.CategoriesDTO;
+import dto.CompanyOrderDTO;
 import dto.CompanyOrderDateShipCountryDTO;
 import dto.CountryCityDTO;
 import dto.CustomerContactDTO;
 import dto.FirstLastOrderDTO;
 import dto.MultipleTableDTO;
 import dto.OrdersDateDifferenceDTO;
+import dto.ProductNameOrderIdDTO;
 import dto.ProductNameSupplierDetailsDTO;
 import dto.SupplierDTO;
 import entities.Categories;
@@ -592,10 +596,81 @@ public class App
 				
 				for(MultipleTableDTO datas : mul) {
 					System.out.println(datas.getCompanyName()+","+datas.getOrderdate()+","+datas.getUnitprice()+","+datas.getProductid()+","+datas.getProductname()+","+datas.getQuantity());
-				}	                    		  
+				}	     
+				
+				/**
+				 * Left Join
+				 * SELECT companyname , orderid
+					FROM customers as cs
+					LEFT JOIN orders od ON od.customerid = cs.customerid;
+				 */
+				
+				Criteria leftJoin = session.createCriteria(Customer.class) 
+											.createAlias("orders", "order", JoinType.LEFT_OUTER_JOIN) 
+											.setProjection(Projections.projectionList()  
+																	  .add(Projections.property("companyName"),"companyName") 
+																	  .add(Projections.property("order.orderid"),"orderid")
+													);
+				leftJoin.setResultTransformer(Transformers.aliasToBean(CompanyOrderDTO.class));
+				List<CompanyOrderDTO> mulx = leftJoin.list();
+				System.out.println("leftJoin @!@!"+mulx.size()); 
+				
+				for(CompanyOrderDTO datas : mulx) {
+					System.out.println(datas.getCompanyName()+","+datas.getOrderid());
+				}	  
+				
+				/**
+				 * Do a Left Join between Products and Orger_details  order_details
+				 */
+				Criteria secondLeft = session.createCriteria(Products.class) 
+											 .createAlias("order_details", "od", JoinType.LEFT_OUTER_JOIN)
+											 .setProjection(Projections.projectionList() 
+													 					.add(Projections.property("productname"),"productname") 
+													 					.add(Projections.property("od.orderid"),"orderid") 
+													 					)
+											 .add(Restrictions.isNull("od.orderid"));
+				
+				secondLeft.setResultTransformer(Transformers.aliasToBean(ProductNameOrderIdDTO.class));
+				List<ProductNameOrderIdDTO> mulxx = secondLeft.list();
+				System.out.println("leftJoin  @!@!"+mulxx.size()); 
+				
+				for(ProductNameOrderIdDTO datas : mulxx) {
+					System.out.println(datas.getProductname()+","+datas.getOrderid());
+				}	 
+				
 			
-				
-				
+				/**
+				 * Right Joins
+				 * ----Right Joins
+					--Pulls back matching records in the first table and all records in second table
+					--Bring back Companyname, orderid using reverse table orederfrom last session
+					
+					SELECT companyname , orderid
+					FROM orders as od 
+					RIGHT JOIN customers as cs ON od.customerid = cs.customerid
+					WHERE od.orderid IS NULL;
+					
+					--Do a Rigt Join Between Customer Demo and Customers
+					SELECT companyname, cd.customerid FROM 
+					customercustomerdemo as cd
+					RIGHT JOIN customers as cs  
+					ON cs.customerid = cd.customerid;
+				 */
+				Criteria rightJoin = session.createCriteria(Orders.class) 
+						.createAlias("cname", "c",JoinType.RIGHT_OUTER_JOIN)
+						.setProjection(Projections.projectionList()  
+												  .add(Projections.property("orderid"))
+												 // .add(Projections.property("customerid"))
+												  .add(Projections.property("c.companyName"),"companyName")
+												  
+								);
+				rightJoin.setResultTransformer(Transformers.aliasToBean(CompanyOrderDTO.class));
+				List<CompanyOrderDTO> mulxr = rightJoin.list();
+				System.out.println("Right Join @!@!"+mulxr.size()); 
+//				
+//				for(CompanyOrderDTO datas : mulxr) {
+//				System.out.println(datas.getCompanyName()+","+datas.getOrderid());
+//						}	  
 				
 				
           

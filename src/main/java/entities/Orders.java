@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Fetch;
@@ -72,8 +73,13 @@ public class Orders {
 	@JoinColumn(name = "orderid", updatable = false, insertable = false)
 	private List<OrderDetails> order_details;
 	
+	@OneToOne(targetEntity = Customer.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@Fetch(FetchMode.SELECT) 
+	@JoinColumn(name = "cutomer_id", updatable = false, insertable = false)
+	private Customer cname;
 	
-
+	
+	
 
 	public List<OrderDetails> getOrder_details() {
 		return order_details;

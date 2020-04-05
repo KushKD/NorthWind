@@ -53,6 +53,11 @@ public class Products {
 	@Fetch(FetchMode.SUBSELECT)
 	@JoinColumn(name = "supplierId", updatable = false, insertable = false)
 	private List<Suppliers> suppliers_; 
+	
+	@OneToMany(targetEntity = OrderDetails.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@Fetch(FetchMode.SUBSELECT)
+	@JoinColumn(name = "productid", updatable = false, insertable = false)
+	private List<OrderDetails> order_details; 
 
 	public Products() {
 		
