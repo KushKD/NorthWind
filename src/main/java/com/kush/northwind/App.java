@@ -5,7 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.criteria.Order;
+import javax.persistence.OrderBy;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -13,6 +13,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.Distinct;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projection;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -421,6 +422,30 @@ public class App
 								crit.addOrder(Order.desc("price"));
 								List<Product> results = crit.list();
 				 */
+				Criteria asc = session.createCriteria(Suppliers.class).setProjection(Projections.distinct(Projections.property("country")))
+																	  .addOrder(Order.asc("country"));
+				List<String> ascDate = asc.list();
+				for(String datas : ascDate) {
+					System.out.println(datas);
+				}
+				
+				Criteria asc2 = session.createCriteria(Suppliers.class)
+												.setProjection( 
+															Projections.distinct(
+																	Projections.projectionList()
+																	.add(Projections.property("country"),"country")
+																	.add(Projections.property("city"),"city")))
+																	.addOrder(Order.asc("country"))
+																	.addOrder(Order.desc("city"))
+																	.setMaxResults(100);
+				asc2.setResultTransformer(Transformers.aliasToBean(CountryCityDTO.class));
+																	
+				List<CountryCityDTO> ascDate2 = asc2.list();
+				System.out.println(ascDate2.size());
+				for(CountryCityDTO datas : ascDate2) {
+					System.out.println(datas.getCountry()+","+datas.getCity());
+				}
+								
 				
 				
 				
