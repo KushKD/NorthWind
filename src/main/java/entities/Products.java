@@ -67,7 +67,7 @@ public class Products {
 	@JoinColumn(name = "productid", updatable = false, insertable = false)
 	private List<OrderDetails> order_details; 
 	
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(targetEntity = Categories.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinColumn(name = "categoryid", updatable = false, insertable = false)
     private Categories category;
 	

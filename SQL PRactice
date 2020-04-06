@@ -1,0 +1,374 @@
+SELECT DISTINCT country , city FROM  customers 
+
+SELECT DISTINCT  region  FROM SUPPLIERS  WHERE region <> '';
+
+SELECT DISTINCT COUNT(region)  FROM SUPPLIERS  
+
+SELECT   COUNT(DISTINCT city)  FROM SUPPLIERS  
+
+SELECT  COUNT(DISTINCT productid) FROM ORDER_Details;
+
+
+SELECT COUNT (*) FROM orders WHERE (shipcountry = 'Canada' OR shipcountry ='Spain') AND shippeddate > '1997-05-01';
+
+-- Between is a shotcut between greater than equal to and less than equal to
+SELECT COUNT (*) FROM order_details WHERE unitprice BETWEEN 10 AND 20;
+
+--Order By
+SELECT DISTINCT country FROM suppliers ORDER BY COUNTRY DESC
+SELECT DISTINCT country FROM suppliers ORDER BY COUNTRY ASC
+
+--
+SELECT productname,unitprice FROM products ORDER BY unitprice DESC,productname ASC
+
+--Pattrens with %  i.e. Like statements
+% stands for Zero and one or more characters
+Where suppliername lke 'a%' ---- all supplier names that starts with a
+Where suppliername lke '%a' ---- all supplier names that ends with a
+Where suppliername lke '%bob%' ---- all supplier names with bob somewhere
+Where suppliername lke 'a%e' ---- all supplier names that starts with a and ends with e
+
+--Patterns with _
+_ stands for any single character
+Where suppliername lke '_a%' ---- all supplier names has a as a second letter
+Where suppliername lke 'E_%_%' ---- all supplier names that starts wit E and has atleast other two letters
+
+
+--Rename Column with Alias
+SELECT unitprice * quantity AS TotalSpend FROM orderdetails ORDER BY TotalSpend DESC
+
+---JOINS---
+By Default Join is Inner Join
+
+-- Bring Back Company Name, Order name and Ship Country
+SELECT companyname, orderdate,shipcountry
+FROM customers
+INNER JOIN orders
+ON orders.customerid = customers.customerid;
+
+--Connect Employees to Orders and Pull back first name, last name and order date for all orders
+SELECT companyname, orderdate,shipcountry
+FROM customers
+INNER JOIN orders
+ON orders.customerid = customers.customerid;
+
+--Connect Products to Suppliers and Pull back Company Name , Unit Stock and Units in Stock
+SELECT companyname,productname,unitsinstock,unitprice
+FROM products as pro
+INNER JOIN suppliers as sup
+ON pro.supplierid = sup.supplierid;
+
+--Inner Joins For Multiple Tables
+--Connect Customers,Orders,OrderDetails
+-- Bring back company name , order date, product id, unit price ,  Quantity 
+
+SELECT companyname , orderdate, productid, unitprice , quantity
+FROM customers c 
+INNER JOIN orders o ON c.customerid = o.customerid 
+INNER JOIN order_details od ON o.orderid = od.orderid;
+
+--Connect Customers,Orders,OrderDetails, products
+-- Bring back company name , order date, product id, unit price ,  Quantity and product name
+SELECT companyname , orderdate, od.productid, od.unitprice , quantity ,productname
+FROM customers c 
+INNER JOIN orders o ON c.customerid = o.customerid 
+INNER JOIN order_details od ON o.orderid = od.orderid
+INNER JOIN products p on od.productid = p.productid;
+
+--Connect Customers,Orders,OrderDetails, products, categories
+-- Bring back company name , order date, product id, unit price ,  Quantity , product name and categoryname
+SELECT companyname , orderdate, od.productid, od.unitprice , quantity ,productname  categoryname
+FROM customers c 
+INNER JOIN orders o ON c.customerid = o.customerid 
+INNER JOIN order_details od ON o.orderid = od.orderid
+INNER JOIN products p on od.productid = p.productid
+INNER JOIN categories cat on cat.categoryid = p.categoryid
+
+--Adding a Where clause to the prvious Query
+SELECT companyname , orderdate, od.productid, od.unitprice , quantity ,productname ,categoryname
+FROM customers c 
+INNER JOIN orders o ON c.customerid = o.customerid 
+INNER JOIN order_details od ON o.orderid = od.orderid
+INNER JOIN products p on od.productid = p.productid
+INNER JOIN categories cat on cat.categoryid = p.categoryid
+WHERE cat.categoryname = 'Seafood' 
+AND od.unitprice * od.quantity >=500;
+
+
+--Left Join
+-- Pulls back all the Records in First Table and any matching Records in the second table
+--Connect Customers to Orders
+--Bring Back Company Name and Order Id
+SELECT companyname , orderid
+FROM customers as cs
+LEFT JOIN orders od ON od.customerid = cs.customerid;
+
+OR
+
+SELECT companyname , orderid
+FROM customers as cs
+LEFT JOIN orders od ON od.customerid = cs.customerid
+WHERE od.orderid IS NULL;
+
+
+--Left Join between Products and order_details  (productname and order_details)
+SELECT productname, orderid
+FROM products as pro
+LEFT JOIN order_details od ON od.productid = pro.productid;
+
+--Using Where Clause
+SELECT productname, orderid
+FROM products as pro
+LEFT JOIN order_details od ON od.productid = pro.productid
+WHERE od.orderid IS NULL;
+
+
+----Right Joins
+--Pulls back matching records in the first table and all records in second table
+--Bring back Companyname, orderid using reverse table orederfrom last session
+
+SELECT companyname , orderid
+FROM orders as od 
+RIGHT JOIN customers as cs ON od.customerid = cs.customerid
+WHERE od.orderid IS NULL;
+
+--Do a Rigt Join Between Customer Demo and Customers
+SELECT companyname, cd.customerid FROM 
+customercustomerdemo as cd
+RIGHT JOIN customers as cs  
+ON cs.customerid = cd.customerid;
+
+
+--Full JOINS
+--Pulls all the Records in the First Table and all the Records in the Second Table
+--Connect Orders to Customeres
+--Bring Back Company Name and Order Id
+SELECT companyname, orderid FROM 
+customers as cs
+FULL JOIN orders as od  
+ON cs.customerid = od.customerid;
+
+--Self Joins
+--Find Suppliers from the same country
+
+
+
+--GroupBy
+--How many Customers we have in a single country
+SELECT country, COUNT(*) FROM customers
+GROUP BY country
+ORDER BY COUNT(*) ASC;
+
+--Number of Products for each category  (USING JOIN)
+SELECT categoryname, COUNT(*) FROM categories   as ct
+INNER JOIN products as pro ON pro.categoryid= ct.categoryid
+GROUP BY categoryname
+ORDER BY COUNT(*) DESC;
+
+--WHAT is the average number of Items ordered for products ordered by the average amount
+SELECT productname , ROUND(AVG(od.quantity)) 
+FROM products AS pro
+INNER JOIN order_details od ON od.productid = pro.productid
+GROUP BY productname
+ORDER BY AVG(od.quantity) DESC;
+
+--HOW MANY SUPPLIERS DO WE HAVE IN EACH COUNRTY
+SELECT country, COUNT(companyname) FROM suppliers
+GROUP BY  country
+ORDER BY COUNT(companyname) DESC;
+
+--Union
+--Combine the Result of Two or More Queries
+
+--Syntax 
+ SELECT  column FROM table1 
+ UNION
+ SELECT column FROM table2
+
+ --Union removes duplicate Rows
+ --Must have same number of Columns , column type must line up
+
+--Get a list of all customer and supplier name
+SELECT companyname FROM customers 
+UNION
+SELECT companyname FROM suppliers;
+--We get all the componies that are suppliers or customers
+
+--Union All  : union all does not remove dublicates
+Find cities of all our customers an suppliers , with one record for each companies city
+
+SELECT city
+FROM customers
+UNION 
+SELECT city 
+FROM suppliers;   -- 93 Rows
+
+SELECT city
+FROM customers
+UNION  ALL
+SELECT city 
+FROM suppliers;  --120 Rows Showing all the dupicates also
+
+--DISTINCT  countries from all the customers and suppliers in alphabatical Order
+(SELECT DISTINCT country FROM customers
+UNION
+SELECT  DISTINCT country FROM suppliers)
+ORDER BY country ASC;
+
+------------------------------
+---SUB QUERIES USING EXISTS
+--SYNTAX
+-- SELECT column_names FROM table WHERE EXISTS( SELECT column_name FROM TABLE WHERE condition
+
+-- Find all the cusomers with an order in 1997
+SELECT companyname
+FROM customers 
+WHERE EXISTS(SELECT customerid FROM orders WHERE orders.customerid = customers.customerid AND
+			 orderdate BETWEEN '1997-04-01' AND '1997-04-30');
+
+
+--Find all the Not cusomers with an order in 1997
+			 SELECT companyname
+FROM customers 
+WHERE NOT EXISTS(SELECT customerid FROM orders WHERE orders.customerid = customers.customerid AND
+			 orderdate BETWEEN '1997-04-01' AND '1997-04-30');
+
+
+-- We can have Joins in a SunQuery
+--What Products didn't have an order in 1997
+SELECT productname
+FROM products 
+WHERE NOT EXISTS(SELECT productid FROM order_details
+				 INNER JOIN orders ON orders.orderid = order_details.orderid
+				 WHERE order_details.productid = products.productid AND
+			 orderdate BETWEEN '1997-04-01' AND '1997-04-30');
+
+
+--Find all the suppliers with a product that costs more than $200
+SELECT companyname
+FROM suppliers 
+WHERE EXISTS (SELECT productid FROM products
+			  WHERE products.supplierid = suppliers.supplierid
+			 AND unitprice>200);
+
+--Sub Queries Using ANY ,  ALL and In   /* TO DO */
+
+
+===========================================================
+
+
+
+
+
+
+
+
+===============INSERT======================================
+INSERT INTO orders
+(customerid, employeeid, orderdate, requireddate, shipvia,
+ freight, shipname, shipaddress, shipcity, shippostalcode,shipcountry)
+VALUES ('VINET', 4, '2017-09-16','2017-09-30',3,
+        42.5, 'Vins et alcools Chevalier',
+        '59 rue de l''Abbaye', 'Reims','51100', 'France');
+
+SELECT MAX(orderid)
+FROM orders;
+
+
+
+INSERT INTO orders
+(orderid,customerid, employeeid, orderdate, requireddate, shipvia,
+ freight, shipname, shipaddress, shipcity, shippostalcode,shipcountry)
+VALUES (11078, 'VINET', 4, '2017-09-16','2017-09-30',3,
+        42.5, 'Vins et alcools Chevalier',"59 rue de l'Abbaye" 'Reims','51100', 'France');
+
+
+
+SELECT *
+FROM PRODUCTS
+WHERE productname='Queso Cabrales'
+productid=11;
+
+
+INSERT INTO order_details
+(orderid, productid, unitprice,quantity,discount)
+VALUES (11078,11,14,20,0);
+
+
+=================UPDATE ==================================================
+UPDATE orders
+SET requireddate='2017-09-20',freight=50
+WHERE orderid=11078;
+
+UPDATE order_details
+SET quantity=40,discount=.05
+WHERE orderid=11078 AND productid=11;
+
+=======================================DELETE ==================================
+DELETE FROM order_details
+WHERE orderid=11078 AND productid=11;
+
+DELETE FROM orders
+WHERE orderid=11078;
+
+=============================SELECT INTO =====================================
+SELECT *
+INTO suppliers_northamerica
+FROM suppliers
+WHERE country in ('USA','Canada');
+
+SELECT *
+INTO orders_1997
+FROM orders
+WHERE orderdate BETWEEN '1997-01-01' AND '1997-12-31';
+
+==================================== Insert Into ================================
+INSERT INTO suppliers_northamerica
+SELECT *
+FROM suppliers
+WHERE country IN ('Brazil','Argentina')
+
+INSERT INTO orders_1997
+SELECT * FROM orders
+WHERE orderdate BETWEEN '1996-12-01' AND '1996-12-31'
+
+======================== Returnig Data from Update , Insert and Delet =================
+INSERT INTO employees
+(firstname,lastname,address,city,country,postalcode,homephone,title,employeeid,reportsto)
+VALUES
+('Bob','Smith','463-4613 Ipsum Street','New Orleans','USA','73-638','741-0423','Chief Strategy',50,NULL)
+RETURNING employeeid;
+
+
+
+INSERT INTO orders (customerid,employeeid,requireddate,shippeddate,orderid)
+VALUES ('VINET',5,'1996-08-01','1996-08-10',500) RETURNING orderid;
+
+UPDATE products
+SET unitprice = unitprice * 1.2
+WHERE productid=1
+RETURNING productid,unitprice AS new_price;
+
+
+
+
+UPDATE order_details
+SET quantity = quantity * 2 
+WHERE orderid=10248 AND productid=11
+RETURNING quantity AS new_quantity;
+
+DELETE FROM employees
+WHERE employeeid=50 
+RETURNING *;
+
+
+
+DELETE FROM orders
+WHERE orderid=500
+RETURNING *;
+
+
+
+
+
+

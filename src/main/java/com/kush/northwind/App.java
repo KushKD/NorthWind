@@ -25,9 +25,11 @@ import org.hibernate.transform.AliasToBeanResultTransformer;
 import org.hibernate.transform.Transformers;
 
 import dto.CategoriesDTO;
+import dto.CategoryProductTotal;
 import dto.CompanyOrderDTO;
 import dto.CompanyOrderDateShipCountryDTO;
 import dto.CountryCityDTO;
+import dto.CountryCustomeid;
 import dto.CustomerContactDTO;
 import dto.FirstLastOrderDTO;
 import dto.MultipleTableDTO;
@@ -698,6 +700,58 @@ public class App
 				full_join.setResultTransformer(Transformers.aliasToBean(ProductCategoryDTO.class));
 				List<ProductCategoryDTO> productCategoryDTO = full_join.list();
 				System.out.println("Full Join Size: "+ productCategoryDTO.size());
+				
+				
+				/**
+				 * How many coustomers do we have in each country 
+				 * SELECT DISTINCT country ,  COUNT(customers.customerid) FROM customers 
+					GROUP BY (customers.country) ORDER BY country ASC;
+					SELECT  country ,  COUNT(*) FROM customers 
+					GROUP BY (country) ORDER BY country DESC;
+				 */
+				
+				Criteria groupby = session.createCriteria(Customer.class) 
+										  .setProjection(Projections.projectionList()  
+												  					 .add(Projections.groupProperty("country"))  
+												  					 . add(Projections.count("cutomer_id")) 
+												  					 
+												  ).addOrder(Order.desc("country"));
+				groupby.setResultTransformer(Transformers.aliasToBean(CountryCustomeid.class));
+				List<CountryCustomeid> groupCategoryDTO = groupby.list();
+				System.out.println("Full Join Size: "+ groupCategoryDTO.size());
+				
+				/**
+				 * No of Products from each category
+				 * SELECT category.categoryname, COUNT(category.*)
+					from categories category
+					INNER JOIN products product on product.categoryid = category.categoryid
+					GROUP BY category.categoryname
+					ORDER BY COUNT(category.*) DESC
+				 */
+				Criteria groupby2 = session.createCriteria(Categories.class,"cat") 
+						                   .createAlias("products", "product",JoinType.INNER_JOIN)
+						                   .setProjection(Projections.projectionList() 
+						                		                      .add(Projections.groupProperty("cat.categoryName"),"categoryName") 
+						                		                      .add(  Projections.count("cat.categoryid"),"categoryid"))
+						                   							  .addOrder(Order.desc("categoryid"));
+//				groupby2.setResultTransformer(Transformers.aliasToBean(CategoryProductTotal.class));
+//				List<CategoryProductTotal> groupCategoryDTO2 = groupby2.list();
+//				System.out.println("GROUP2 "+ groupCategoryDTO2.size());
+				
+				/**
+				 * How Many Suppliers do we have in each country
+				 * SELECT country, COUNT(suppliers.*) 
+					FROM suppliers 
+					GROUP BY country 
+					ORDER BY COUNT(suppliers.*) DESC
+				 */
+				
+				/**
+				 * Having to Gilter Groups
+				 * Customers tat have brought more than 5000$ of products
+				 * Union,Intersect,EXCEPT  for combining Queries
+				 * Group by, grouping sets, rollup and cube
+				 */
 				
           
         tx.commit();	
