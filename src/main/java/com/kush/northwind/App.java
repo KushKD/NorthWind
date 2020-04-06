@@ -32,6 +32,7 @@ import dto.CustomerContactDTO;
 import dto.FirstLastOrderDTO;
 import dto.MultipleTableDTO;
 import dto.OrdersDateDifferenceDTO;
+import dto.ProductCategoryDTO;
 import dto.ProductNameOrderIdDTO;
 import dto.ProductNameSupplierDetailsDTO;
 import dto.SupplierDTO;
@@ -670,8 +671,33 @@ public class App
 //				
 //				for(CompanyOrderDTO datas : mulxr) {
 //				System.out.println(datas.getCompanyName()+","+datas.getOrderid());
-//						}	  
+//						}	
 				
+				
+				/**
+				 * --Full JOINS
+					--Pulls all the Records in the First Table and all the Records in the Second Table
+					--Connect Orders to Customeres
+					--Bring Back Company Name and Order Id
+					SELECT companyname, orderid FROM 
+					customers as cs
+					FULL JOIN orders as od  
+					ON cs.customerid = od.customerid;
+					DO A FULL JOIN BETWEEN PRODUCTS AND CATEGORIES
+					SELECT products.productname , cat.categoryname 
+					FROM PRODUCTS as products
+					FULL JOIN categories cat on cat.categoryid = products.categoryid
+				 */
+				
+				Criteria full_join = session.createCriteria(Products.class)  
+											.createAlias("category", "cat",JoinType.FULL_JOIN)
+											.setProjection(Projections.projectionList()
+																	  .add(Projections.property("productname"),"productname")
+																	  .add(Projections.property("cat.categoryName"),"categoryname")
+													);
+				full_join.setResultTransformer(Transformers.aliasToBean(ProductCategoryDTO.class));
+				List<ProductCategoryDTO> productCategoryDTO = full_join.list();
+				System.out.println("Full Join Size: "+ productCategoryDTO.size());
 				
           
         tx.commit();	

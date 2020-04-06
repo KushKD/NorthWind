@@ -1,10 +1,17 @@
 package entities;
 
 import java.util.Arrays;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -13,7 +20,7 @@ public class Categories {
 	
 	@Id
 	@Column(name="categoryid")
-	private int category_id;
+	private int categoryid;
 	
 	@Column(name="categoryname")
 	private String categoryName;
@@ -23,18 +30,40 @@ public class Categories {
 	
 	@Column(name="picture")
 	private Byte[] picture;
+	
+//	@OneToMany(fetch = FetchType.LAZY, mappedBy = "category")
+//    private List<Products> products;
+	
+	 
+	
+	 
+	 @OneToMany(fetch = FetchType.LAZY, mappedBy = "category")
+	    private List<Products> products;
 
 	public Categories() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
+	
+	
+	
+	
+
+	public List<Products> getProducts() {
+		return products;
+	}
+
+
+
+
+
 
 	public int getCategory_id() {
-		return category_id;
+		return categoryid;
 	}
 
 	public void setCategory_id(int category_id) {
-		this.category_id = category_id;
+		this.categoryid = category_id;
 	}
 
 	public String getCategoryName() {
@@ -63,7 +92,7 @@ public class Categories {
 
 	@Override
 	public String toString() {
-		return "Categories [category_id=" + category_id + ", categoryName=" + categoryName + ", description="
+		return "Categories [category_id=" + categoryid + ", categoryName=" + categoryName + ", description="
 				+ description + ", picture=" + Arrays.toString(picture) + "]";
 	}
 

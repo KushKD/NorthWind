@@ -8,7 +8,9 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Fetch;
@@ -49,6 +51,12 @@ public class Products {
 	@Column(name="discontinued")
 	private Integer discontinued ;
 	
+	
+	
+	
+	
+
+
 	@OneToMany(targetEntity = Suppliers.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@Fetch(FetchMode.SUBSELECT)
 	@JoinColumn(name = "supplierId", updatable = false, insertable = false)
@@ -58,6 +66,13 @@ public class Products {
 	@Fetch(FetchMode.SUBSELECT)
 	@JoinColumn(name = "productid", updatable = false, insertable = false)
 	private List<OrderDetails> order_details; 
+	
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "categoryid", updatable = false, insertable = false)
+    private Categories category;
+	
+	
+
 
 	public Products() {
 		
@@ -65,7 +80,25 @@ public class Products {
 		// TODO Auto-generated constructor stub
 	}
 	
+		
 	
+
+	
+
+
+
+
+	public Categories getCustomers() {
+		return category;
+	}
+
+
+
+
+
+
+
+
 
 	public List<Suppliers> getSuppliers_() {
 		return suppliers_;
