@@ -1,0 +1,89 @@
+#Insert
+
+smallint    small range integer  2 bytes
+integer     integer 			4 bytes
+bigint      large range integer  8 bytes
+
+smallserial  small auto incrmenting integer 2 bytes
+serial       auto incrementing integer  4 bytes
+bigserial    big auto incrementing integer 8 bytes
+
+decimal      total_digits(digits, digitsinfraction)
+numeric
+
+
+REAL 				6 digit precision
+double precision    15 dggit precision
+
+character varing varchar(n)
+character char(n)
+text unlimited lenght
+
+
+timestamp
+date
+time
+interval
+
+boolean 1 byte
+
+# Create Table
+====================================
+CREATE TABLE subscribers (
+	firstname varchar(200),
+	 lastname varchar(200),
+	email varchar(250),
+	signup timestamp,
+	frequency integer,
+	iscustomer boolean
+);
+
+CREATE TABLE returns (
+	returnrid serial,
+	customerid char(5),
+	returndate timestamp,
+	productid integer,
+	quantity smallint,
+	orderid integer
+);
+
+#Alter Table
+====================================
+ALTER TABLE subscribers
+RENAME firstname TO first_name;
+
+ALTER TABLE returns
+RENAME returndate TO return_date;
+
+ALTER TABLE subscribers
+RENAME TO email_subscribers;
+
+ALTER TABLE returns
+RENAME TO bad_orders;
+
+==Add Columns
+ALTER TABLE email_subscribers
+ADD COLUMN last_visit_date timestamp;
+
+ALTER TABLE bad_orders
+ADD COLUMN reason text;
+
+
+ALTER TABLE email_subscribers
+DROP COLUMN last_visit_date;
+
+ALTER TABLE bad_orders
+DROP COLUMN reason;
+
+ALTER TABLE email_subscribers
+ALTER COLUMN email SET DATA TYPE varchar(225);
+
+==Alter Column
+ALTER TABLE bad_orders
+ALTER COLUMN quantity SET DATA TYPE int;
+
+
+==Drop Table
+DROP TABLE email_subscribers;
+
+DROP TABLE bad_orders;
